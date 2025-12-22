@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<title>モバイル注文（演出用）</title>
+<title>モバイル注文</title>
 
-<!-- 上品めの和文タイポ -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -25,7 +24,7 @@
   img{max-width:100%; display:block}
   .app{max-width:920px; margin:0 auto 48px}
 
-  /* ヘッダー（白・細金ライン） */
+  /* ヘッダー */
   header{
     position:sticky; top:0; z-index:10;
     background:rgba(255,255,255,.9);
@@ -49,17 +48,17 @@
     padding:8px 14px; border-radius:999px; color:#595858; font-size:13px; font-weight:500;
   }
 
-  /* ヒーロー */
+  /* ヒーロー（黒ベース） */
   .hero{
     margin:14px; border-radius:16px; overflow:hidden;
-    background:#fff; border:1px solid var(--border); box-shadow:var(--shadow);
+    background:#111; border:1px solid #111; box-shadow:var(--shadow); color:#fff;
   }
   .heroInner{padding:36px 24px}
   .catch{
     font-family:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
-    letter-spacing:.03em; font-size:22px; font-weight:700; margin-top:6px;
+    letter-spacing:.03em; font-size:22px; font-weight:700; margin-top:6px; color:#fff;
   }
-  .sub{color:var(--muted); margin-top:6px}
+  .sub{color:#e6e0d4; margin-top:6px}
 
   /* メニュー（ダミー） */
   section{padding:22px 16px}
@@ -163,7 +162,7 @@
     <div class="bar">
       <div class="brand">
         <div class="mark">◆</div>
-        <div class="name">モバイル注文</div>
+        <div class="name">丸鶏るいすけ</div>
       </div>
       <div class="pill" id="cartPill">選択 0 品</div>
     </div>
@@ -172,16 +171,16 @@
       <a class="chip" href="#yakimono">焼き物</a>
       <a class="chip" href="#agemono">揚げ物</a>
       <a class="chip" href="#gohan">ご飯もの</a>
-      <a class="chip" href="#drink">ドリンク</a>
+      <a class="chip" id="navDrink" href="#drink">ドリンク</a>
       <a class="chip" href="#surprise">本日のおすすめ</a>
     </nav>
   </header>
 
-  <!-- ヒーロー -->
+  <!-- ヒーロー（黒ベース） -->
   <div class="hero">
     <div class="heroInner">
       <div class="catch">丸鶏と旬菜、旨い酒。</div>
-      <div class="sub">本ページは演出用のダミー注文サイトです。お席からそのままご注文（風）。</div>
+      <div class="sub">新宿の喧騒を離れた落ち着いた雰囲気の中で、食事と会話をゆったりと楽しめるのが当店の魅力。</div>
     </div>
   </div>
 
@@ -195,10 +194,10 @@
   <!-- スクロールで出る “本日のおすすめ” = ドッキリ告知 -->
   <section id="surprise">
     <div class="reveal" id="revealBox">
-      <!-- スクロール前に見せる文言 -->
+      <!-- スクロール前に見せる文言（後でJSで差し替え） -->
       <div class="cover hideOnReveal">
         <div class="badge">本日のおすすめ</div>
-        <div class="hint">
+        <div class="hint" id="hintText">
           竹内くんが来年結婚するかも...ということですが<br>
           ↓こちらへスクロール
         </div>
@@ -223,7 +222,7 @@
 <!-- トースト -->
 <div class="toast" id="toast">追加しました（※ダミーです）</div>
 
-<!-- モーダル（文言差し替え済み） -->
+<!-- モーダル -->
 <div class="modal" id="congratsModal" aria-hidden="true">
   <div class="box">
     <p class="title">今からスマホを反対向きにして机に置き、周耶におめでとうを言ってあげてください。</p>
@@ -305,6 +304,14 @@ document.body.addEventListener('click', e=>{
   showToast('追加しました（※ダミーです）');
 });
 
+/* ====== ドリンク押下でヒント文言を差し替え ====== */
+document.getElementById('navDrink').addEventListener('click', ()=>{
+  const hint = document.getElementById('hintText');
+  if(hint){
+    hint.innerHTML = '斎藤くん今年もお疲れ様でした！<br>竹内くんが来年結婚するかもということですが...<br>下にスクロールしてください↓';
+  }
+});
+
 /* ====== ドッキリ：スクロールで発火（表示・紙吹雪・以降注文停止） ====== */
 const box = document.getElementById('revealBox');
 const confettiRoot = document.getElementById('confetti');
@@ -320,14 +327,14 @@ const io = new IntersectionObserver(entries=>{
 },{threshold:0.45});
 io.observe(box);
 
-/* 注文停止（全ての追加ボタンを無効化し、ピル文言も変更） */
+/* 注文停止：ボタン無効化＋ピル文言を「カート」に */
 function disableOrdering(){
   document.querySelectorAll('.add').forEach(b=> b.setAttribute('disabled',''));
-  pill.textContent = '本日は注文停止中';
+  pill.textContent = 'カート';
   showToast('本日は注文できません（ドッキリでした）');
 }
 
-/* 紙吹雪生成（countで量を調整） */
+/* 紙吹雪生成 */
 function launchConfetti(count=120){
   const colors=['#e6b85c','#f39c6b','#9fc490','#7aa5d8','#b28fd3','#f1c27d','#f08d6e'];
   for(let i=0;i<count;i++){
@@ -340,14 +347,13 @@ function launchConfetti(count=120){
     el.style.animationDelay = (Math.random()*0.8)+'s';
     el.style.background = colors[Math.floor(Math.random()*colors.length)];
     confettiRoot.appendChild(el);
-    // 後片付け
     setTimeout(()=> el.remove(), 9000);
   }
 }
 
-/* ====== 祝うボタン：紙吹雪ドーン→モーダル ====== */
+/* ====== 祝うボタン：紙吹雪→モーダル ====== */
 document.getElementById('celebrateBtn').addEventListener('click', ()=>{
-  launchConfetti(200); // 豪華に
+  launchConfetti(200);
   openModal();
 });
 
