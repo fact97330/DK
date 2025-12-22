@@ -209,7 +209,7 @@
         <div class="confetti" id="confetti"></div>
         <h3 class="big">工藤周耶くんが初彼女と付き合うこととなりました㊗️㊗️</h3>
         <p class="msg" style="margin-top:.6em">
-          ということでここからは注文できません、残念でした笑笑
+          ということでここからは注文できません、店員さんを呼びましょう！
         </p>
         <div class="center">
           <button class="cta" id="celebrateBtn">祝う</button>
@@ -311,7 +311,7 @@ function showToast(text){
 document.body.addEventListener('click', e=>{
   const btn=e.target.closest('.add'); if(!btn || btn.disabled) return;
   count++; pill.textContent = `選択 ${count} 品`;
-  showToast('追加しました（※ダミーです）');
+  showToast('追加しました');
 });
 
 /* ====== ドリンク押下でポップアップ ====== */
