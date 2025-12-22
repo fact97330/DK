@@ -26,8 +26,7 @@
 
   /* ヘッダー */
   header{
-    position:sticky; top:0; z-index:10;
-    background:#fff;
+    position:sticky; top:0; z-index:10; background:#fff;
     border-bottom:1px solid var(--border);
   }
   /* 上段バー＝黒背景＋金文字 */
@@ -46,7 +45,7 @@
     margin-left:auto; background:#fff; border:1px solid var(--border);
     padding:6px 12px; border-radius:999px; color:#6a6968; font-size:12px; font-weight:600;
   }
-  /* 下段ナビは従来の白 */
+  /* 下段ナビ */
   nav{display:flex; gap:8px; overflow:auto; padding:10px 14px; border-top:1px solid var(--border); background:#fff}
   .chip{
     white-space:nowrap; background:#fff; border:1px solid var(--border);
@@ -105,11 +104,9 @@
     display:flex; align-items:center; justify-content:center; flex-direction:column;
     gap:8px; text-align:center; padding:28px
   }
+  /* アクティブ時はカバーを消す */
+  .reveal.active .cover{display:none}
   .hint{color:var(--muted); font-size:13px}
-  .badge{
-    display:inline-block; background:#fff; border:1px solid var(--border); color:#c8a049;
-    padding:6px 10px; border-radius:999px; font-size:12px; margin-bottom:12px; font-weight:700;
-  }
   .content{opacity:0; transform:translateY(8px); transition:.6s ease; padding:24px}
   .reveal.active .content{opacity:1; transform:none}
   .big{
@@ -199,9 +196,8 @@
   <!-- スクロールで出る “本日のおすすめ” = ドッキリ告知 -->
   <section id="surprise">
     <div class="reveal" id="revealBox">
-      <!-- スクロール前に見せる文言（下で変更なし） -->
+      <!-- カバー：バッジ削除／文言だけ -->
       <div class="cover hideOnReveal">
-        <div class="badge">本日のおすすめ</div>
         <div class="hint" id="hintText">
           竹内くんが来年結婚するかも...ということですが<br>
           OKをクリック！！
@@ -227,9 +223,16 @@
 <!-- トースト -->
 <div class="toast" id="toast">追加しました</div>
 
+<!-- ドリンク用ポップアップ（OKボタン付き） -->
+<div class="modal" id="drinkModal" aria-hidden="true">
+  <div class="box">
+    <p class="title">斎藤くん今年もお疲れ様でした！</p>
+    <p class="note">竹内くんが来年結婚するかも…ということですが<br>OKをクリック！！</p>
+    <button class="ok" id="drinkOk">OK</button>
+  </div>
+</div>
 
-
-<!-- 祝う後のモーダル（既存） -->
+<!-- 祝う後のモーダル -->
 <div class="modal" id="congratsModal" aria-hidden="true">
   <div class="box">
     <p class="title">今からスマホを反対向きにして机に置き、周耶におめでとうを言ってあげてください。</p>
@@ -315,8 +318,7 @@ document.body.addEventListener('click', e=>{
 const drinkModal = document.getElementById('drinkModal');
 function openDrink(){ drinkModal.classList.add('show'); drinkModal.setAttribute('aria-hidden','false'); }
 function closeDrink(){ drinkModal.classList.remove('show'); drinkModal.setAttribute('aria-hidden','true'); }
-document.getElementById('navDrink').addEventListener('click', (e)=>{
-  // すぐ表示して誘導
+document.getElementById('navDrink').addEventListener('click', ()=>{
   openDrink();
 });
 document.getElementById('drinkOk').addEventListener('click', closeDrink);
@@ -328,16 +330,16 @@ const confettiRoot = document.getElementById('confetti');
 const io = new IntersectionObserver(entries=>{
   entries.forEach(en=>{
     if(en.isIntersecting){
-      box.classList.add('active');
-      launchConfetti(110);
-      disableOrdering();
+      box.classList.add('active');     // コンテンツ表示
+      launchConfetti(110);             // 紙吹雪
+      disableOrdering();               // 以降は注文停止
       io.disconnect();
     }
   });
 },{threshold:0.45});
 io.observe(box);
 
-/* 注文停止：ボタン無効化＋ピル文言を「カート」に */
+/* 注文停止：ボタン無効化＋ピル文言を「カート」 */
 function disableOrdering(){
   document.querySelectorAll('.add').forEach(b=> b.setAttribute('disabled',''));
   pill.textContent = 'カート';
@@ -364,15 +366,15 @@ function launchConfetti(count=120){
 /* ====== 祝うボタン：紙吹雪→モーダル ====== */
 document.getElementById('celebrateBtn').addEventListener('click', ()=>{
   launchConfetti(200);
-  openModal();
+  openCongrats();
 });
 
 /* 祝う後のモーダル制御 */
 const modal = document.getElementById('congratsModal');
-function openModal(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
-function closeModal(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
-document.getElementById('modalOk').addEventListener('click', closeModal);
-modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
+function openCongrats(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
+function closeCongrats(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+document.getElementById('modalOk').addEventListener('click', closeCongrats);
+modal.addEventListener('click', (e)=>{ if(e.target===modal) closeCongrats(); });
 </script>
 </body>
 </html>
