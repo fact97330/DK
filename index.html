@@ -27,14 +27,18 @@
   /* ヘッダー */
   header{
     position:sticky; top:0; z-index:10;
-    background:rgba(255,255,255,.9);
-    backdrop-filter:saturate(1.1) blur(8px);
+    background:#fff;
     border-bottom:1px solid var(--border);
   }
-  .bar{display:flex; align-items:center; gap:12px; padding:12px 18px}
+  /* 上段バー＝黒背景＋金文字 */
+  .bar{
+    display:flex; align-items:center; gap:12px; padding:12px 18px;
+    background:#111; color:var(--brand);
+  }
   .brand{display:flex; align-items:center; gap:10px}
   .brand .mark{color:var(--brand); font-weight:900}
   .brand .name{
+    color:var(--brand);
     font-family:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
     letter-spacing:.03em; font-weight:700;
   }
@@ -42,7 +46,8 @@
     margin-left:auto; background:#fff; border:1px solid var(--border);
     padding:6px 12px; border-radius:999px; color:#6a6968; font-size:12px; font-weight:600;
   }
-  nav{display:flex; gap:8px; overflow:auto; padding:10px 14px; border-top:1px solid var(--border)}
+  /* 下段ナビは従来の白 */
+  nav{display:flex; gap:8px; overflow:auto; padding:10px 14px; border-top:1px solid var(--border); background:#fff}
   .chip{
     white-space:nowrap; background:#fff; border:1px solid var(--border);
     padding:8px 14px; border-radius:999px; color:#595858; font-size:13px; font-weight:500;
@@ -136,7 +141,7 @@
   }
   .toast.show{opacity:1}
 
-  /* モーダル */
+  /* モーダル共有スタイル */
   .modal{
     position:fixed; inset:0; display:none; place-items:center; z-index:60;
     background:rgba(0,0,0,.35); backdrop-filter: blur(3px);
@@ -148,7 +153,7 @@
   }
   .modal .title{
     font-family:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
-    letter-spacing:.03em; font-size:20px; font-weight:700; margin:0 0 8px;
+    letter-spacing:.03em; font-size:18px; font-weight:700; margin:0 0 8px;
   }
   .modal .note{color:var(--muted); margin:8px 0 16px}
   .modal .ok{
@@ -194,7 +199,7 @@
   <!-- スクロールで出る “本日のおすすめ” = ドッキリ告知 -->
   <section id="surprise">
     <div class="reveal" id="revealBox">
-      <!-- スクロール前に見せる文言（後でJSで差し替え） -->
+      <!-- スクロール前に見せる文言（下で変更なし） -->
       <div class="cover hideOnReveal">
         <div class="badge">本日のおすすめ</div>
         <div class="hint" id="hintText">
@@ -222,7 +227,16 @@
 <!-- トースト -->
 <div class="toast" id="toast">追加しました（※ダミーです）</div>
 
-<!-- モーダル -->
+<!-- ドリンク用ポップアップ -->
+<div class="modal" id="drinkModal" aria-hidden="true">
+  <div class="box">
+    <p class="title">斎藤くん今年もお疲れ様でした！</p>
+    <p class="note">竹内くんが来年結婚するかも…ということですが<br>下にスクロールしてください↓</p>
+    <button class="ok" id="drinkOk">OK</button>
+  </div>
+</div>
+
+<!-- 祝う後のモーダル（既存） -->
 <div class="modal" id="congratsModal" aria-hidden="true">
   <div class="box">
     <p class="title">今からスマホを反対向きにして机に置き、周耶におめでとうを言ってあげてください。</p>
@@ -289,7 +303,7 @@ renderSection('agemono', MENU.agemono);
 renderSection('gohan', MENU.gohan);
 renderSection('drink', MENU.drink);
 
-/* ====== フェイクカート（ヘッダーのピルだけ） ====== */
+/* ====== フェイクカート ====== */
 let count = 0;
 const pill = document.getElementById('cartPill');
 const toast = document.getElementById('toast');
@@ -304,23 +318,26 @@ document.body.addEventListener('click', e=>{
   showToast('追加しました（※ダミーです）');
 });
 
-/* ====== ドリンク押下でヒント文言を差し替え ====== */
-document.getElementById('navDrink').addEventListener('click', ()=>{
-  const hint = document.getElementById('hintText');
-  if(hint){
-    hint.innerHTML = '斎藤くん今年もお疲れ様でした！<br>竹内くんが来年結婚するかもということですが...<br>下にスクロールしてください↓';
-  }
+/* ====== ドリンク押下でポップアップ ====== */
+const drinkModal = document.getElementById('drinkModal');
+function openDrink(){ drinkModal.classList.add('show'); drinkModal.setAttribute('aria-hidden','false'); }
+function closeDrink(){ drinkModal.classList.remove('show'); drinkModal.setAttribute('aria-hidden','true'); }
+document.getElementById('navDrink').addEventListener('click', (e)=>{
+  // すぐ表示して誘導
+  openDrink();
 });
+document.getElementById('drinkOk').addEventListener('click', closeDrink);
+drinkModal.addEventListener('click', (e)=>{ if(e.target===drinkModal) closeDrink(); });
 
-/* ====== ドッキリ：スクロールで発火（表示・紙吹雪・以降注文停止） ====== */
+/* ====== ドッキリ：スクロールで発火 ====== */
 const box = document.getElementById('revealBox');
 const confettiRoot = document.getElementById('confetti');
 const io = new IntersectionObserver(entries=>{
   entries.forEach(en=>{
     if(en.isIntersecting){
       box.classList.add('active');
-      launchConfetti(110); // 初回
-      disableOrdering();   // 以降は注文できない
+      launchConfetti(110);
+      disableOrdering();
       io.disconnect();
     }
   });
@@ -357,7 +374,7 @@ document.getElementById('celebrateBtn').addEventListener('click', ()=>{
   openModal();
 });
 
-/* モーダル制御 */
+/* 祝う後のモーダル制御 */
 const modal = document.getElementById('congratsModal');
 function openModal(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
 function closeModal(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
