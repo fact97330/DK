@@ -64,7 +64,7 @@
   }
   .sub{color:#e6e0d4; margin-top:6px}
 
-  /* メニュー（ダミー） */
+  /* メニュー */
   section{padding:22px 16px}
   h2{
     font-family:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
@@ -78,8 +78,8 @@
     border-radius:12px; overflow:hidden; box-shadow:var(--shadow);
   }
   .thumb{
-    aspect-ratio:4/3; background:linear-gradient(135deg,#f5efe4,#f0eadf);
-    display:flex; align-items:center; justify-content:center; color:#9b948a; font-size:12px;
+    aspect-ratio:4/3; width:100%; height:auto; object-fit:cover;
+    background:#f2eee6;
   }
   .body{padding:14px 16px}
   .name{font-weight:700}
@@ -104,7 +104,6 @@
     display:flex; align-items:center; justify-content:center; flex-direction:column;
     gap:8px; text-align:center; padding:28px
   }
-  /* アクティブ時はカバーを消す */
   .reveal.active .cover{display:none}
   .hint{color:var(--muted); font-size:13px}
   .content{opacity:0; transform:translateY(8px); transition:.6s ease; padding:24px}
@@ -178,7 +177,7 @@
     </nav>
   </header>
 
-  <!-- ヒーロー（黒ベース） -->
+  <!-- ヒーロー -->
   <div class="hero">
     <div class="heroInner">
       <div class="catch">丸鶏と旬菜、旨い酒。</div>
@@ -186,17 +185,16 @@
     </div>
   </div>
 
-  <!-- メニュー（ダミー） -->
+  <!-- メニュー -->
   <section id="tsumami"><h2>つまみ</h2><div class="grid" id="g-tsumami"></div></section>
   <section id="yakimono"><h2>焼き物</h2><div class="grid" id="g-yakimono"></div></section>
   <section id="agemono"><h2>揚げ物</h2><div class="grid" id="g-agemono"></div></section>
   <section id="gohan"><h2>ご飯もの</h2><div class="grid" id="g-gohan"></div></section>
   <section id="drink"><h2>ドリンク</h2><div class="grid" id="g-drink"></div></section>
 
-  <!-- スクロールで出る “本日のおすすめ” = ドッキリ告知 -->
+  <!-- ドッキリ告知 -->
   <section id="surprise">
     <div class="reveal" id="revealBox">
-      <!-- カバー（バッジ無し） -->
       <div class="cover hideOnReveal">
         <div class="hint" id="hintText">
           竹内くんが来年結婚するかも...ということですが<br>
@@ -204,7 +202,6 @@
         </div>
       </div>
 
-      <!-- 表示ブロック（ここにスクロール） -->
       <div class="content" id="revealContent">
         <div class="confetti" id="confetti"></div>
         <h3 class="big" id="congratsHead">工藤周耶くんが初彼女と付き合うこととなりました㊗️㊗️</h3>
@@ -223,7 +220,7 @@
 <!-- トースト -->
 <div class="toast" id="toast">追加しました</div>
 
-<!-- ドリンク用ポップアップ（OKボタン付き） -->
+<!-- 誘導ポップアップ（OKボタン付き） -->
 <div class="modal" id="drinkModal" aria-hidden="true">
   <div class="box">
     <p class="title">斎藤くん今年もお疲れ様でした！</p>
@@ -242,56 +239,59 @@
 </div>
 
 <script>
-/* ====== ダミーメニュー ====== */
+/* ====== 画像つきダミーメニュー ====== */
+/* 画像ファイルは index.html と同じフォルダに下記ファイル名で置いてください */
 const MENU = {
   tsumami: [
-    {name:'枝豆', price:390, desc:'まずは定番。'},
-    {name:'冷奴', price:340, desc:'さっぱり出汁醤油で。'},
-    {name:'たこわさ', price:420, desc:'つんとくる旨さ。'},
-    {name:'塩ダレキャベツ', price:360, desc:'止まらないやつ。'}
+    {name:'枝豆',      price:390, img:'枝豆.jpg',        desc:'まずは定番。'},
+    {name:'冷奴',      price:340, img:'冷奴.jpg',        desc:'さっぱり出汁醤油で。'},
+    {name:'たこわさ',  price:420, img:'たこわさ.jpg',    desc:'つんとくる旨さ。'},
+    {name:'塩ダレキャベツ', price:360, img:'塩だれ.jpeg', desc:'止まらないやつ。'}
   ],
   yakimono: [
-    {name:'ねぎま（2本）', price:320, desc:'塩 or タレ'},
-    {name:'つくね（2本）', price:380, desc:'月見 +¥60'},
-    {name:'ししとう', price:300, desc:'香ばしく。'},
-    {name:'サバ炙り', price:560, desc:'脂乗ってます。'}
+    {name:'ねぎま（2本）', price:320, img:'ねぎま.jpg', desc:'塩 or タレ'},
+    {name:'つくね（2本）', price:380, img:'つくね.png',  desc:'月見 +¥60'},
+    {name:'ししとう',      price:300, img:'ししとう.jpeg', desc:'香ばしく'},
+    {name:'サバ炙り',      price:560, img:'鯖.jpg',       desc:'脂乗ってます。'}
   ],
   agemono: [
-    {name:'唐揚げ', price:590, desc:'外カリ中ジューシー。'},
-    {name:'ポテト', price:450, desc:'2種ソース。'},
-    {name:'なんこつ揚げ', price:520, desc:'コリコリ食感。'},
-    {name:'カマンベールフライ', price:530, desc:'蜂蜜添え。'}
+    {name:'唐揚げ',       price:590, img:'唐揚げ.jpg',     desc:'外カリ中ジューシー。'},
+    {name:'ポテト',       price:450, img:'ポテト.jpeg',     desc:'2種ソース。'},
+    {name:'カマンベールフライ', price:530, img:'カマンベール.jpeg', desc:'蜂蜜添え。'},
+    {name:'なんこつ揚げ', price:520, img:'軟骨.jpg',       desc:'コリコリ食感。'}
   ],
   gohan: [
-    {name:'焼きおにぎり', price:420, desc:'香ばしい醤油。'},
-    {name:'〆の出汁茶漬け', price:480, desc:'鮭 or 梅。'},
-    {name:'ソース焼きそば', price:620, desc:'鉄板仕上げ。'}
+    {name:'焼きおにぎり', price:420, img:'焼きおにぎり.jpg', desc:'香ばしい醤油。'},
+    {name:'〆の出汁茶漬け', price:480, img:'茶漬け.jpg',     desc:'鮭 or 梅。'},
+    {name:'ソース焼きそば', price:620, img:'焼きそば.jpg',   desc:'鉄板仕上げ。'}
   ],
   drink: [
-    {name:'生ビール', price:580, desc:'キンキンに冷えてます。'},
-    {name:'ハイボール', price:520, desc:'強炭酸。'},
-    {name:'レモンサワー', price:500, desc:'果汁たっぷり。'},
-    {name:'烏龍茶', price:300, desc:'ノンアルもどうぞ。'}
+    {name:'生ビール',   price:580, img:'生ビール.jpg',    desc:'キンキンに冷えてます。'},
+    {name:'ハイボール', price:520, img:'ハイボール.jpg',  desc:'強炭酸。'},
+    {name:'レモンサワー', price:500, img:'れもんサワー.jpeg', desc:'果汁たっぷり。'},
+    {name:'烏龍茶',     price:300, img:'烏龍茶.jpeg',      desc:'ノンアルもどうぞ。'}
   ]
 };
 function yen(n){ return '¥' + n.toLocaleString('ja-JP'); }
 
-/* ====== メニュー描画 ====== */
+/* ====== メニュー描画（画像付き） ====== */
 function renderSection(id, items){
   const root = document.getElementById('g-'+id);
-  root.innerHTML = items.map((it,i)=>`
-    <div class="card">
-      <div class="thumb">No.${i+1}</div>
-      <div class="body">
-        <div class="name">${it.name}</div>
-        <div class="desc">${it.desc}</div>
-        <div class="priceRow">
-          <div class="price">${yen(it.price)}</div>
-          <button class="add" data-name="${it.name}" data-price="${it.price}">追加</button>
+  root.innerHTML = items.map((it,i)=>{
+    const src = encodeURI(it.img); // 日本語ファイル名をURLエンコード
+    return `
+      <div class="card">
+        <img class="thumb" src="${src}" alt="${it.name}">
+        <div class="body">
+          <div class="name">${it.name}</div>
+          <div class="desc">${it.desc||''}</div>
+          <div class="priceRow">
+            <div class="price">${yen(it.price)}</div>
+            <button class="add" data-name="${it.name}" data-price="${it.price}">追加</button>
+          </div>
         </div>
-      </div>
-    </div>
-  `).join('');
+      </div>`;
+  }).join('');
 }
 renderSection('tsumami', MENU.tsumami);
 renderSection('yakimono', MENU.yakimono);
@@ -308,20 +308,23 @@ function showToast(text){
   toast.classList.add('show');
   setTimeout(()=>toast.classList.remove('show'), 1200);
 }
+
+/* どの「追加」でもポップアップを出す → OKで下へ */
 document.body.addEventListener('click', e=>{
   const btn=e.target.closest('.add'); if(!btn || btn.disabled) return;
   count++; pill.textContent = `選択 ${count} 品`;
   showToast('追加しました（※ダミーです）');
+  openDrink(); // ←必ず誘導ポップアップ
 });
 
-/* ====== ドリンク押下でポップアップ ====== */
+/* ====== ドリンクナビ押下でも同じポップアップ ====== */
 const drinkModal = document.getElementById('drinkModal');
 function openDrink(){ drinkModal.classList.add('show'); drinkModal.setAttribute('aria-hidden','false'); }
 function closeDrink(){ drinkModal.classList.remove('show'); drinkModal.setAttribute('aria-hidden','true'); }
 document.getElementById('navDrink').addEventListener('click', ()=>{ openDrink(); });
 document.getElementById('drinkOk').addEventListener('click', ()=>{
   closeDrink();
-  revealNowAndScroll(); // ← OK後に下まで移動
+  revealNowAndScroll(); // OK後に下まで移動
 });
 drinkModal.addEventListener('click', (e)=>{ if(e.target===drinkModal) closeDrink(); });
 
@@ -348,12 +351,12 @@ function doRevealEffects(){
   revealed = true;
 }
 
-/* OK後は確実に本文位置へスクロール（ヘッダー分オフセット） */
+/* OK後は本文位置へスクロール（ヘッダー分＋少し下） */
 function revealNowAndScroll(){
   doRevealEffects();
-  const target = document.getElementById('revealContent'); // スクロール先
+  const target = document.getElementById('revealContent');
   const header = document.querySelector('header');
-  const offset = (header?.offsetHeight || 80) + 10; // 少し下目に
+  const offset = (header?.offsetHeight || 80) + 24;
   const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
   window.scrollTo({ top, behavior:'smooth' });
 }
