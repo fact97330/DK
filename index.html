@@ -196,7 +196,7 @@
   <!-- スクロールで出る “本日のおすすめ” = ドッキリ告知 -->
   <section id="surprise">
     <div class="reveal" id="revealBox">
-      <!-- カバー：バッジ削除／文言だけ -->
+      <!-- カバー（バッジ無し） -->
       <div class="cover hideOnReveal">
         <div class="hint" id="hintText">
           竹内くんが来年結婚するかも...ということですが<br>
@@ -204,12 +204,12 @@
         </div>
       </div>
 
-      <!-- スクロール後に出す文言 -->
-      <div class="content">
+      <!-- 表示ブロック（ここにスクロール） -->
+      <div class="content" id="revealContent">
         <div class="confetti" id="confetti"></div>
-        <h3 class="big">工藤周耶くんが初彼女と付き合うこととなりました㊗️㊗️</h3>
+        <h3 class="big" id="congratsHead">工藤周耶くんが初彼女と付き合うこととなりました㊗️㊗️</h3>
         <p class="msg" style="margin-top:.6em">
-          ということでここからは注文できません、店員さんを呼びましょう！
+          ということでここからは注文できません、残念でした笑笑
         </p>
         <div class="center">
           <button class="cta" id="celebrateBtn">祝う</button>
@@ -311,33 +311,52 @@ function showToast(text){
 document.body.addEventListener('click', e=>{
   const btn=e.target.closest('.add'); if(!btn || btn.disabled) return;
   count++; pill.textContent = `選択 ${count} 品`;
-  showToast('追加しました');
+  showToast('追加しました（※ダミーです）');
 });
 
 /* ====== ドリンク押下でポップアップ ====== */
 const drinkModal = document.getElementById('drinkModal');
 function openDrink(){ drinkModal.classList.add('show'); drinkModal.setAttribute('aria-hidden','false'); }
 function closeDrink(){ drinkModal.classList.remove('show'); drinkModal.setAttribute('aria-hidden','true'); }
-document.getElementById('navDrink').addEventListener('click', ()=>{
-  openDrink();
+document.getElementById('navDrink').addEventListener('click', ()=>{ openDrink(); });
+document.getElementById('drinkOk').addEventListener('click', ()=>{
+  closeDrink();
+  revealNowAndScroll(); // ← OK後に下まで移動
 });
-document.getElementById('drinkOk').addEventListener('click', closeDrink);
 drinkModal.addEventListener('click', (e)=>{ if(e.target===drinkModal) closeDrink(); });
 
-/* ====== ドッキリ：スクロールで発火 ====== */
+/* ====== ドッキリ：スクロールで発火（保険） ====== */
 const box = document.getElementById('revealBox');
 const confettiRoot = document.getElementById('confetti');
+let revealed = false;
 const io = new IntersectionObserver(entries=>{
   entries.forEach(en=>{
     if(en.isIntersecting){
-      box.classList.add('active');     // コンテンツ表示
-      launchConfetti(110);             // 紙吹雪
-      disableOrdering();               // 以降は注文停止
+      doRevealEffects();
       io.disconnect();
     }
   });
 },{threshold:0.45});
 io.observe(box);
+
+/* 表示・紙吹雪・注文停止を一度だけ実行 */
+function doRevealEffects(){
+  if(revealed) return;
+  box.classList.add('active');
+  launchConfetti(110);
+  disableOrdering();
+  revealed = true;
+}
+
+/* OK後は確実に本文位置へスクロール（ヘッダー分オフセット） */
+function revealNowAndScroll(){
+  doRevealEffects();
+  const target = document.getElementById('revealContent'); // スクロール先
+  const header = document.querySelector('header');
+  const offset = (header?.offsetHeight || 80) + 10; // 少し下目に
+  const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+  window.scrollTo({ top, behavior:'smooth' });
+}
 
 /* 注文停止：ボタン無効化＋ピル文言を「カート」 */
 function disableOrdering(){
